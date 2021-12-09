@@ -9,9 +9,9 @@ hhhhhhhhhhhhhhh
 ERROR: Permission to felixdawu/test-public.git denied to PCMUSA.——注意SSH私钥在PCMUSA用户上，而去访问felixdawu的存储库自然是无法访问。
 2、HTTPS连接，对于公共库，只要不出现443超时错误，即连接成功
 （2）验证
-token会转换为windows凭据
-Version Control==>Github==>添加的账号，实际只起“验证”的作用，如果不在这里添加推送时连接成功后，会弹出token框和添加账号的框，然后转换成Windows凭据；如果在这里添加后，凭据管理里面则不会出现。
-不输入token将会出现“Authentication failed”提示。
+Version Control==>Github==>添加的账号，实际只起“验证”的作用（可能只针对菜单项“Git”中GitHub相关选项，gitee和gitlab好像是必须在这里添加账号，但未实际测试）。
+HTTPS推送时，如果不在这里添加推送时连接成功后，会弹出token框和添加账号的框，然后转换成Windows凭据；如果在这里添加后，仍然会出现token弹框（好像起不到省事少输入token值的作用），而且凭据管理里面在输入token成功后仍然会留下记录。当然，不输入token将会出现“Authentication failed”提示。总之，该种情况token会转换为windows凭据。
+SSH推送时，不会出现token弹框，也不会产生windows凭据记录。这里也没有在设置中版本控制部分添加账号，说明SSH方式GitHub验证时不会使用设置中的账号信息。
 
 二、Git的全局和仓库配置中的账号信息使用在哪些地方？
 无论是全局配置，还是仓库配置，其账号信息只对commit记录的摘要起作用。
