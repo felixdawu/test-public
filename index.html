@@ -1,2 +1,64 @@
 8888888888888
 3333333333333
+1111111111111
+<script type="text/javascript">
+    //<![CDATA[
+    window.onload = function (){
+        // var authorUrl = document.getElementById("mycontent");
+        // var copyright_area = document.getElementById("copyright-area");
+        //alert(copyright_area.innerHTML);
+        //var test = $("#copyright-area").find("#mycontent").remove();
+        $("#mycontent").attr({rel:"nofollow"});
+    }
+    //]]>
+</script>
+<div style="text-align:left;">
+    Hot Search:<span style="padding-left:15px;"><a href="https://pluscare-medical.blogspot.com/search?q=Disposable+SpO2+Sensors">Disposable SpO2 Sensors</a></span>
+    <span style="padding-left:15px;"><a href="https://pluscare-medical.blogspot.com/search?q=ECG+Trunk+Cables">ECG Trunk Cables</a></span>
+    <span style="padding-left:15px;"><a href="https://pluscare-medical.blogspot.com/search?q=EKG+Wires">EKG Wires</a></span>
+    <span style="padding-left:15px;"><a href="https://pluscare-medical.blogspot.com/search?q=Reusable+NIBP+Cuffs">Reusable NIBP Cuffs</a></span>
+</div>
+<script type="text/javascript">
+    //<![CDATA[
+    $(function () {
+        var mobile_menuwrap = $(".mobile-menu-wrap");
+        var menuitems, contacts, is_mobile = false;
+        if(mobile_menuwrap.css("display")==='block'){
+            menuitems = mobile_menuwrap.find("#main-menu-nav>li");
+            is_mobile = true;
+        } else {
+            menuitems = $("#main-menu").find("#main-menu-nav>li");
+        }
+        menuitems.each(function (index) {
+            if (index+1===menuitems.length) {
+                contacts = $(this);
+                $(this).click(function () {
+                    var webinfo = $("#official-web-info");
+                    $(this).parent().parent().append(webinfo);
+                    webinfo.css({"display":"block"});
+                    $("#official-web-url").html("<a href='https://pluscaremedical.com/'>https://pluscaremedical.com/</a>");
+                    if(is_mobile){
+                      webinfo.css({"position":"initial", "margin-top":"0", "color":"white"});
+                    }
+                    return false;
+                });
+            }
+        });
+        $(document).on('click', function (event) {
+            var ele = event.srcElement ? event.srcElement : event.target;
+            if( $(ele).attr("id") === 'official-web-info' || $(ele) === contacts ) {
+                event.stopPropagation();
+            }
+            else{
+                $("#official-web-info").css({"display":"none"});
+            }
+        });
+    });
+    window.onload = function (){
+        var menu = $("#main-menu-nav");
+        $("li a[role=menuitem]:last", menu).on("hover", "#header-wrap", function () {
+            alert($(this).html());return false;
+        });
+    }
+    //]]>
+</script>
