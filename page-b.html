@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>页面b</title>
+</head>
+<body>
+<div class="textb">页面a中的JS脚本试图操作该节点，修改文本</div>
+<script type="text/javascript">
+    var p = document.createElement("p");
+    var text = document.createTextNode("JS添加的段落文本");
+    p.appendChild(text);
+    document.body.appendChild(p);
+    document.getElementsByClassName("texta")[0].innerHTML = "";
+</script>
+</body>
+</html>

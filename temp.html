@@ -1,0 +1,27 @@
+<script type="text/javascript">
+    $.ajax({
+        url: "https://pluscaremedical.com/api/2021-10/graphql.json",
+        type: "POST",
+        data: `query{
+                  products(first:5) {
+                    edges {
+                      node {
+                        id
+                      }
+                    }
+                  }
+                }`,
+        processData: false,
+        headers: {
+            "Content-Type": "application/graphql",
+            "X-Shopify-Storefront-Access-Token": "9ec0d4d92b60f4ebcd8cd5f7eec5a77a"
+        },
+        success: function (res) {
+            console.log("成功：", res);
+        },
+        error: function (xhr) {
+            console.log("失败：", xhr);
+            alert("状态码：" + xhr.status);
+        }
+    });
+</script>

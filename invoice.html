@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Invoice</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 </head>
 <body>
 <h1 style="text-align: center;">Commercial Invoice</h1>
@@ -26,15 +27,140 @@
 <div class="order-info" style="margin: 0 20px;">
     <div style="clear: both;"></div>
     <div style="float: left;">
-        <p><strong>Po No.: </strong>Order #1075</p>
+        <p><strong>Po No.: </strong>Order {{ order_name }}</p>
         <p><strong>Invoice No: </strong>Order #1075</p>
-        <p><strong>Issue Date: </strong>Dec 8th,2021</p>
-        <p><strong>Shipping Date: </strong>Dec 8th,2021</p>
+        <p><strong>Issue Date: </strong>{{ processed_at | date: "%b %d, %Y" }}</p>
+        <p><strong>Shipping Date: </strong>{{ "now" | date: "%b %d, %Y" }}</p>
     </div>
     <div style="float: right;">
         <p><strong>Freight Term: </strong>FedEx Prepay</p>
         <p><strong>Payment Term: </strong>T/T in advance</p>
-        <p><strong>FedEx.tracking#: </strong></p>
+        <p><strong>FedEx.tracking#: </strong>{{ Order.successfulFulfillments }}</p>
+        {% if transactions %}
+            {% for attr in transactions %}
+                {{ attr }}
+            {% else %}
+                {{ "空" }}
+            {%endfor%}
+        {%endif%}
+        <div class="test" style="color: red"></div>
+        <script type="text/javascript">
+/*            $.post(
+                // "https://pluscare-medical.myshopify.com/api/2021-10/graphql.json",
+                // "https://47230517415.myshopify.com/api/2021-10/graphql.json",
+                "https://pluscaremedical.com/api/2021-10/graphql.json",
+                `{
+                    products(first:5) {
+                        edges {
+                            node {
+                                id
+                            }
+                        }
+                    }
+                }`,
+                function (data) {
+                    var str = JSON.stringify(data)
+                    $(".test").html(str)
+                    console.log(data);
+                },
+                "json"
+            );
+            //该种方式无法成功，返回403*/
+/*            $.ajax({
+                // url: "https://47230517415.myshopify.com/api/2021-10/graphql.json",
+                url: "https://pluscaremedical.com/api/2021-10/graphql.json",
+                type: "POST",
+                data: `{ shop { name } }`,
+                processData: false,
+                headers: {
+                    "Content-Type": "application/graphql",
+                    "X-Shopify-Storefront-Access-Token": "9ec0d4d92b60f4ebcd8cd5f7eec5a77a"
+                },
+                success: function (data) {
+                    console.log("成功：", data);
+                },
+                error: function (xhr) {
+                    console.log("失败：", xhr);
+                    alert("状态码：" + xhr.status);
+                }
+            });
+            //该种方式可以成功！*/
+/*            const query = `{ shop { name } }`;
+            function apiCall(query) {
+                return fetch('https://pluscaremedical.com/api/2021-10/graphql.json',
+                    { method: 'POST',
+                        headers: { 'Content-Type': 'application/graphql',
+                            // "Access-Control-Origin": "*",
+                            // "Access-Control-Allow-Origin": "*",
+                            'X-Shopify-Storefront-Access-Token': "9ec0d4d92b60f4ebcd8cd5f7eec5a77a"
+                        },
+                        "body": query })
+                    .then(response => response.json()) }
+            apiCall(query).then(response => { console.log(response) });
+            //该种方式可以成功！*/
+            var mutation = `mutation customerAccessTokenCreate($input: CustomerAccessTokenCreateInput!) {
+                            customerAccessTokenCreate(input: $input) {
+                                customerUserErrors {
+                                    code
+                                    field
+                                    message
+                                }
+                                customerAccessToken {
+                                    accessToken
+                                    expiresAt
+                                }
+                            }
+                        }`
+/*            var mutation = `mutation customerAccessTokenCreate {
+                            customerAccessTokenCreate(input: {
+                                email: "felix@unimed.cn",
+                                password: "0.123456"
+                              }) {
+                                customerUserErrors {
+                                    code
+                                    field
+                                    message
+                                }
+                                customerAccessToken {
+                                    accessToken
+                                    expiresAt
+                                }
+                            }
+                        }`*/
+/*            var variables = {
+                              "input": {
+                                "email": "felix@unimed.cn",
+                                "password": "0.123456"
+                              }
+                            }*/
+            var variables = {
+                "input": {
+                    email: "felix@unimed.cn",
+                    password: "0.123456"
+                }
+            }
+            $.ajax({
+                // url: "https://pluscaremedical.com/api/2021-10/graphql.json",
+                url: "https://pluscare-medical.myshopify.com/api/2021-10/graphql.json",
+                type: "POST",
+                // data: `query { shop { name }, variables {"id": "123"}`,
+                // data: `query { customer(customerAccessToken:"ef7d05664e0ff6c27a68508d5ee6a36b") { displayName } }`,
+                data: JSON.stringify({ mutation, variables }),
+                // data: mutation,
+                processData: false,
+                headers: {
+                    "Content-Type": "application/graphql",
+                    "X-Shopify-Storefront-Access-Token": "9ec0d4d92b60f4ebcd8cd5f7eec5a77a"
+                },
+                success: function (res) {
+                    console.log("成功：", res);
+                },
+                error: function (xhr) {
+                    console.log("失败：", xhr);
+                    alert("状态码：" + xhr.status);
+                }
+            });
+        </script>
     </div>
     <div style="clear: both;"></div>
 </div>
