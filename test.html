@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script type="text/javascript">
+    //const定义的是常量不可变，var定义的是变量可以变
+    const url = 'https://pluscaremedical.com/api/2021-10/graphql.json';
+    // const url = 'https://pluscare-medical.myshopify.com/api/2021-10/graphql.json';
+    var mutation = `mutation customerAccessTokenCreate($input: CustomerAccessTokenCreateInput!) {
+                customerAccessTokenCreate(
+                    input: $input
+                ){
+                    customerUserErrors {
+                      code
+                      field
+                      message
+                    }
+                    customerAccessToken {
+                      accessToken
+                      expiresAt
+                    }
+                }
+            }`
+    var variables = {
+        input: {
+            email: "123@qq.com",
+            password: "0.123456"
+        }
+    }
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            "X-Shopify-Storefront-Access-Token": "9ec0d4d92b60f4ebcd8cd5f7eec5a77a"
+        },
+        body: JSON.stringify({
+            query: mutation,
+            // mutation: mutation,
+            variables: variables,
+        }),
+    })
+        .then(res => res.json())
+        .then(res => console.log(res))
+    // .catch(err => {
+    //     console.log('-- gql err --')
+    //     console.error(err);
+    // })
+</script>
+</body>
+</html>

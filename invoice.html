@@ -43,96 +43,70 @@
                 {{ "空" }}
             {%endfor%}
         {%endif%}
-        <div class="test" style="color: red"></div>
+        <div class="test" style="color: red">测试文本</div>
         <script type="text/javascript">
-/*            $.post(
-                // "https://pluscare-medical.myshopify.com/api/2021-10/graphql.json",
-                // "https://47230517415.myshopify.com/api/2021-10/graphql.json",
-                "https://pluscaremedical.com/api/2021-10/graphql.json",
-                `{
-                    products(first:5) {
-                        edges {
-                            node {
-                                id
-                            }
-                        }
+            //注意：QueryRoot根查询的blog字段，其参数handle句柄值是blog博客分类目录title标题的句柄化字符串，而不是“blog post”博客帖子的句柄值，如博客帖子https://domainname.com/blogs/myarticle/test是在myarticle博客目录中，这里应取“myarticle”，而不是“blogs/myarticle/test”。
+            //1.1、直接将参数值写进来方式
+            var query = `query {
+                blog(handle:"myarticle") {
+                    id
+                    title
+                    seo {
+                        title
+                        description
                     }
-                }`,
-                function (data) {
-                    var str = JSON.stringify(data)
-                    $(".test").html(str)
-                    console.log(data);
-                },
-                "json"
-            );
-            //该种方式无法成功，返回403*/
-/*            $.ajax({
-                // url: "https://47230517415.myshopify.com/api/2021-10/graphql.json",
-                url: "https://pluscaremedical.com/api/2021-10/graphql.json",
-                type: "POST",
-                data: `{ shop { name } }`,
-                processData: false,
-                headers: {
-                    "Content-Type": "application/graphql",
-                    "X-Shopify-Storefront-Access-Token": "9ec0d4d92b60f4ebcd8cd5f7eec5a77a"
-                },
-                success: function (data) {
-                    console.log("成功：", data);
-                },
-                error: function (xhr) {
-                    console.log("失败：", xhr);
-                    alert("状态码：" + xhr.status);
                 }
-            });
-            //该种方式可以成功！*/
-/*            const query = `{ shop { name } }`;
-            function apiCall(query) {
-                return fetch('https://pluscaremedical.com/api/2021-10/graphql.json',
-                    { method: 'POST',
-                        headers: { 'Content-Type': 'application/graphql',
-                            // "Access-Control-Origin": "*",
-                            // "Access-Control-Allow-Origin": "*",
-                            'X-Shopify-Storefront-Access-Token': "9ec0d4d92b60f4ebcd8cd5f7eec5a77a"
-                        },
-                        "body": query })
-                    .then(response => response.json()) }
-            apiCall(query).then(response => { console.log(response) });
-            //该种方式可以成功！*/
+            }`
+            //1.2、通过变量传递参数方式
+            var query = `query blog($handle:String!) {
+                blog(handle:$handle) {
+                    id
+                    title
+                    seo {
+                        title
+                        description
+                    }
+                }
+            }`
+            var variables = {
+                handle: "myarticle"
+            }
+
+            //2.1、直接将参数值写进来方式
+            var mutation = `mutation {
+                customerAccessTokenCreate(
+                    input: {
+                        email: "felix@unimed.cn",
+                        password: "0.123456"
+                        }
+                ){
+                    customerUserErrors {
+                        code
+                        field
+                        message
+                    }
+                    customerAccessToken {
+                        accessToken
+                        expiresAt
+                    }
+                }
+            }`
+            //2.2、通过变量传递参数方式
             var mutation = `mutation customerAccessTokenCreate($input: CustomerAccessTokenCreateInput!) {
-                            customerAccessTokenCreate(input: $input) {
-                                customerUserErrors {
-                                    code
-                                    field
-                                    message
-                                }
-                                customerAccessToken {
-                                    accessToken
-                                    expiresAt
-                                }
-                            }
-                        }`
-/*            var mutation = `mutation customerAccessTokenCreate {
-                            customerAccessTokenCreate(input: {
-                                email: "felix@unimed.cn",
-                                password: "0.123456"
-                              }) {
-                                customerUserErrors {
-                                    code
-                                    field
-                                    message
-                                }
-                                customerAccessToken {
-                                    accessToken
-                                    expiresAt
-                                }
-                            }
-                        }`*/
-/*            var variables = {
-                              "input": {
-                                "email": "felix@unimed.cn",
-                                "password": "0.123456"
-                              }
-                            }*/
+                customerAccessTokenCreate(
+                    input: $input
+                ){
+                    customerUserErrors {
+                      code
+                      field
+                      message
+                    }
+                    customerAccessToken {
+                      accessToken
+                      expiresAt
+                    }
+                }
+            }`
             var variables = {
                 "input": {
                     email: "felix@unimed.cn",
@@ -145,11 +119,13 @@
                 type: "POST",
                 // data: `query { shop { name }, variables {"id": "123"}`,
                 // data: `query { customer(customerAccessToken:"ef7d05664e0ff6c27a68508d5ee6a36b") { displayName } }`,
-                data: JSON.stringify({ mutation, variables }),
-                // data: mutation,
+                // data: JSON.stringify({ mutation, variables }),//对象简写方式，必须写成“{ query, variables }”
+                data: JSON.stringify({ query: mutation, variables }),
+                // data: query,
                 processData: false,
                 headers: {
-                    "Content-Type": "application/graphql",
+                    // "Content-Type": "application/graphql",//内容内容必须为json，否则API无法成功解析。参考https://shopify.dev/api/usage/response-codes，400 Bad Request。
+                    "Content-Type": "application/json",
                     "X-Shopify-Storefront-Access-Token": "9ec0d4d92b60f4ebcd8cd5f7eec5a77a"
                 },
                 success: function (res) {
@@ -160,6 +136,121 @@
                     alert("状态码：" + xhr.status);
                 }
             });
+/*function apiCall(query) {
+    return fetch('https://pluscare-medical.myshopify.com/api/2021-10/graphql.json',
+        { method: 'POST',
+            headers: { 'Content-Type': 'application/graphql',
+                // "Access-Control-Allow-Origin": "*",
+                'X-Shopify-Storefront-Access-Token': "9ec0d4d92b60f4ebcd8cd5f7eec5a77a"
+            },
+            "body": query })
+        .then(response => response.json()) }
+// var query = JSON.stringify({ mutation });
+apiCall(mutation).then(response => { console.log(response) });*/
+/*const response = fetch(
+    `https://pluscare-medical.myshopify.com/api/2021-10/graphql.json`,
+    {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/graphql",
+            "X-Shopify-Storefront-Access-Token": "9ec0d4d92b60f4ebcd8cd5f7eec5a77a"
+        },
+        // body: JSON.stringify({ mutation, variables }),//同样该种方式mutation无法成功解析
+        body: mutation,
+    },
+).then((response) => response.json());
+console.log(response);*/
+        </script>
+        <script type="text/javascript">
+            const url = 'https://pluscare-medical.myshopify.com/api/2021-10/graphql.json';
+            const query = `
+                mutation customerCreate($input: CustomerCreateInput!) {
+                    customerCreate(input: $input) {
+                        userErrors {
+                          field
+                          message
+                        }
+                        customer {
+                          id
+                        }
+                    }
+                }
+            `;
+            //1、查询参数传递的变量对象，"variables"属性名有且只能是这个名称，测试时修改后无法成功创建customer。另外对象中属性handle没有$符合。
+            //2、若邮箱已经创建，则返回的json对象虽正常而其中有userErrors:
+            // {
+            //     "data": {
+            //     "customerCreate": {
+            //         "userErrors": [
+            //             {
+            //                 "field": [
+            //                     "input",
+            //                     "email"
+            //                 ],
+            //                 "message": "Email has already been taken"
+            //             }
+            //         ],
+            //             "customer": null
+            //     }
+            // }
+            // }
+            //3、当Content-Type一定要设置为“application/json”，设置为application/graphql时，即使全部语句都无语法错误也将返回errors:
+            // [
+            //     {
+            //         "message": "Parse error on \"query\" (STRING) at [1, 2]",
+            //         "locations": [
+            //             {
+            //                 "line": 1,
+            //                 "column": 2
+            //             }
+            //         ]
+            //     }
+            // ]
+            //4、当通过传递变量方式查询时（这里使用的例子是上面的query blog($handle:String!)），若语句是query blog($handle:String!) { blog(handle:"myarticle")而不是query blog($handle:String!) { blog(handle:$handle)，则将返回errors:
+            // [
+            //     {
+            //         "message": "Variable $handle is declared by blog but not used",
+            //         "locations": [
+            //             {
+            //                 "line": 2,
+            //                 "column": 9
+            //             }
+            //         ],
+            //         "path": [
+            //             "query blog"
+            //         ],
+            //         "extensions": {
+            //             "code": "variableNotUsed",
+            //             "variableName": "handle"
+            //         }
+            //     }
+            // ]
+            //5、查询post提交的数据对象只能是“{query: query,variables: variables}”，其中的属性字段名称不能更换为其他，如{mutation: mutation,variables: variables}，否则GraphQL API无法解析，将返回如下errors:
+            // {
+            //     "errors": "Parameter Missing or Invalid"
+            // }
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "X-Shopify-Storefront-Access-Token": "9ec0d4d92b60f4ebcd8cd5f7eec5a77a"
+                },
+                body: JSON.stringify({
+                    query: query,
+                    variables: {
+                        input: {
+                            email: "123@qq.com",
+                            password: "0.123456"
+                        }
+                    },
+                }),
+            })
+                .then(res => res.json())
+                .then(res => console.log(res))
+            // .catch(err => {
+            //     console.log('-- gql err --')
+            //     console.error(err);
+            // })
         </script>
     </div>
     <div style="clear: both;"></div>
