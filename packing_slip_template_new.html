@@ -1,0 +1,86 @@
+<h1 style="text-align: center;">Commercial Invoice</h1>
+<div class="address">
+    <div style="clear: both;"></div>
+    <ul style="width: 50%; float: left; list-style: none; padding-left: 0;">
+        <li style="list-style: none; margin: 10px 15px 20px; padding: 5px;"><strong>Billing to: </strong>{% if billing_address.company != blank %}{{ billing_address.company }}{% else %}Dear {{ billing_address.first_name }}{% endif %}</li>
+        <li style="list-style: none; margin: 10px 15px; padding: 5px; border-bottom: 1px solid #8a8a8a;"><strong>Attn: </strong>{{ billing_address.name }}</li>
+        <li style="list-style: none; margin: 10px 15px; padding: 5px; border-bottom: 1px solid #8a8a8a;"><strong>Tel: </strong>{% if billing_address.phone != blank %}{{ billing_address.phone }}{% else %}{{ email }}{% endif %}</li>
+        <li style="list-style: none; margin: 10px 15px; padding: 5px; border-bottom: 1px solid #8a8a8a;"><strong>Add: </strong>{{ billing_address.address1 }}{% if billing_address.address2 != blank %}, {{ billing_address.address2 }}{% endif %}, {{ billing_address.city }} {{ billing_address.province_code }} {{ billing_address.zip }}, {{ billing_address.country }}</li>
+    </ul>
+    <ul style="width: 50%; float: right; list-style: none; padding-left: 0;">
+        <li style="list-style: none; margin: 10px 15px 20px; padding: 5px;"><strong>Shipping to: </strong>{% if shipping_address.company != blank %}{{ shipping_address.company }}{% else %}Dear {{ shipping_address.first_name }}{% endif %}</li>
+        <li style="list-style: none; margin: 10px 15px; padding: 5px; border-bottom: 1px solid #8a8a8a;"><strong>Attn: </strong>{{ shipping_address.name }}</li>
+        <li style="list-style: none; margin: 10px 15px; padding: 5px; border-bottom: 1px solid #8a8a8a;"><strong>Tel: </strong>{% if shipping_address.phone != blank %}{{ shipping_address.phone }}{% else %}{{ email }}{% endif %}</li>
+        <li style="list-style: none; margin: 10px 15px; padding: 5px; border-bottom: 1px solid #8a8a8a;"><strong>Add: </strong>{{ shipping_address.address1 }}{% if shipping_address.address2 != blank %}, {{ shipping_address.address2 }}{% endif %}, {{ shipping_address.city }} {{ shipping_address.province_code }} {{ shipping_address.zip }}, {{ shipping_address.country }}</li>
+    </ul>
+    <div style="clear: both;"></div>
+</div>
+<div class="order-info" style="margin: 0 20px;">
+    <div style="clear: both;"></div>
+    <div style="float: left;">
+        <p><strong>Po No.: </strong>Order #{{ order.order_number }}</p>
+        <p><strong>Invoice No: </strong>Order #{{ order.order_number }}</p>
+        <p><strong>Issue Date: </strong>{{ order.created_at | date: "%b %d, %Y" }}</p>
+        <p><strong>Shipping Date: </strong>{{ "now" | date: "%b %d, %Y" }}</p>
+    </div>
+    <div style="float: right;">
+        <p><strong>Freight Term: </strong>FedEx Prepay{{ checkout.name }}</p>
+        <p><strong>Payment Term: </strong>T/T in advance</p>
+        <p><strong>FedEx.tracking#: </strong>{{ fulfillment.tracking_number }}</p>
+    </div>
+    <div style="clear: both;"></div>
+</div>
+<div style="margin: 0 20px;">
+    <table class="goods" style="margin: 0 auto; border: 2px solid; border-collapse: collapse;" >
+        <colgroup>
+            <col>
+            <col span="2">
+            <col span="3">
+        </colgroup>
+        <thead style="background-color: #888888;">
+        <tr style="border-bottom: 2px solid;">
+            <th style="border-right: 2px solid; padding: 10px; text-align: center;">Item</th>
+            <th style="border-right: 2px solid; padding: 10px; text-align: center;">Part No.</th>
+            <th style="border-right: 2px solid; padding: 10px; text-align: center;">Description</th>
+            <th style="border-right: 2px solid; padding: 10px; text-align: center;">Qty</th>
+            <th style="border-right: 2px solid; padding: 10px; text-align: center;">Price</th>
+            <th style="padding: 10px; text-align: center;">Total in USD</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% assign total_qty = 0 %}
+        {% for line_item in line_items %}
+        <tr style="border-bottom: 2px solid;">
+            <td style="border-right: 2px solid; padding: 10px; text-align: center;">{{ forloop.index }}</td>
+            <td style="border-right: 2px solid; padding: 10px; text-align: center; white-space: nowrap;">{{ line_item.sku }}</td>
+            <td style="border-right: 2px solid; padding: 10px; text-align: left;">{{ line_item.title }}</td>
+            <td style="border-right: 2px solid; padding: 10px; text-align: center;">{{ line_item.quantity }} x</td>
+            <td style="border-right: 2px solid; padding: 10px; text-align: center;">{% if line_item.original_price != line_item.price %}<s>{{ line_item.original_price | money }}</s>{% endif %}{{ line_item.original_price | money }}</td>
+            <td style="padding: 10px; text-align: center;">{{ line_item.original_price | times: line_item.quantity | money }}</td>
+        </tr>
+        {% assign total_qty = total_qty | plus: line_item.quantity %}
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <td style="border-right: 2px solid; padding: 10px; text-align: left;"></td>
+            <td style="border-right: 2px solid; padding: 10px; text-align: left;"></td>
+            <td style="border-right: 2px solid; padding: 10px; text-align: left;">Total in USD</td>
+            <td style="border-right: 2px solid; padding: 10px; text-align: center;">{{ total_qty }}</td>
+            <td style="border-right: 2px solid; padding: 10px; text-align: left;"></td>
+            <td style="padding: 10px; text-align: center;">{{ order.subtotal_price | money }}</td>
+        </tr>
+        </tfoot>
+    </table>
+    {% if order.note != blank %}
+    <h3 style="margin: 0 0 1em 0;">Note</h3>
+    <p>{{ order.note }}</p>
+    {% endif %}
+</div>
+<div class="auth-info" style="margin: 40px 20px 0; clear: both;">
+    <p><span>510K Number: </span></p>
+    <p><span>Owner Operator Number: </span></p>
+    <p><span>Device Listing Number: </span></p>
+    <p><span>Product Code: </span></p>
+    <p><span>Establishment Registration Number: </span></p>
+</div>
